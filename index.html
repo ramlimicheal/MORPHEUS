@@ -2,11 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>MORPHEUS — Neural Sovereignty Engine</title>
   <meta name="description" content="Reprogram your subconscious with your own music, vision board, and axioms. Real neuroscience. 10 minutes a day.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0A0A0A">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
   <link rel="stylesheet" href="css/morpheus.css">
+  <link rel="stylesheet" href="css/responsive.css">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
@@ -23,7 +29,19 @@
   </div>
   <script>if(window.location.protocol==='file:'){document.getElementById('protocol-warning').style.display='flex';}</script>
 
+  <!-- PWA Install Banner (Phase 2) -->
+  <div class="pwa-install-banner" id="pwa-install-banner">
+    <div class="pwa-install-text">
+      <span>&#x1f9e0;</span>
+      <span>Install MORPHEUS for offline use</span>
+    </div>
+    <button class="pwa-install-btn" id="pwa-install-btn">Install</button>
+    <button class="pwa-dismiss-btn" id="pwa-dismiss-btn">&times;</button>
+  </div>
+
   <div id="app">
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
     <!-- DASHBOARD SIDEBAR -->
     <aside class="sidebar" id="protocol-nav">
       <div class="sidebar-header">
@@ -34,7 +52,7 @@
         </div>
       </div>
       
-      <!-- Search bar mock (from screenshot) -->
+      <!-- Search bar -->
       <div class="search-wrap">
         <span class="search-icon"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
         <input type="text" class="search-input" placeholder="Search configs...">
@@ -47,6 +65,9 @@
         </button>
         <button class="nav-tab" data-tab="protocols">
           <span class="nav-icon"><i data-lucide="brain" style="width: 14px; height: 14px;"></i></span> Protocols
+        </button>
+        <button class="nav-tab" data-tab="analytics">
+          <span class="nav-icon"><i data-lucide="bar-chart-2" style="width: 14px; height: 14px;"></i></span> Analytics
         </button>
       </div>
 
@@ -77,6 +98,9 @@
     <!-- MAIN DASHBOARD CONTENT -->
     <main class="dashboard-content" id="main">
       <div class="topbar">
+        <button class="hamburger-btn" id="hamburger-btn" aria-label="Open menu">
+          <i data-lucide="menu" style="width: 24px; height: 24px;"></i>
+        </button>
         <h1 class="page-title">Session Configuration</h1>
         <div id="ultradian-wrap">
           <span id="ultradian-label">Cycle 1 · RAMP · 0/90min</span>
@@ -86,6 +110,16 @@
 
       <!-- Session Setup Grid -->
       <div id="session-setup" class="visible">
+        <!-- Preset Selector (Phase 5) -->
+        <div class="preset-bar" id="preset-bar">
+          <select class="preset-select" id="preset-select">
+            <option value="">Load Preset...</option>
+          </select>
+          <button class="preset-save-btn" id="preset-save-btn">
+            <i data-lucide="save" style="width: 12px; height: 12px; margin-right: 4px;"></i> Save Preset
+          </button>
+        </div>
+
         <div class="dash-grid">
           
           <div style="--card-bg-img: url('../assets/thumbnails/abstract_nebula.png'); --card-hue: 0deg;" class="dash-card span-2">
@@ -202,6 +236,22 @@
             </div>
           </div>
 
+          <!-- Isochronic Tones (Phase 4) -->
+          <div style="--card-bg-img: url('../assets/thumbnails/dark_fluid.png'); --card-hue: 200deg;" class="dash-card isochronic-card">
+            <div class="card-header">
+              <span class="card-icon"><i data-lucide="activity" style="width: 16px; height: 16px;"></i></span>
+              <h3>Isochronic Tones</h3>
+            </div>
+            <p class="card-desc">Amplitude-modulated pulse. No headphones required.</p>
+            <div class="audio-controls" id="iso-selector">
+              <button class="freq-btn active" data-iso="none">None</button>
+              <button class="freq-btn" data-iso="delta">Delta 2Hz</button>
+              <button class="freq-btn" data-iso="theta">Theta 6Hz</button>
+              <button class="freq-btn" data-iso="alpha">Alpha 10Hz</button>
+              <button class="freq-btn" data-iso="beta">Beta 20Hz</button>
+            </div>
+          </div>
+
           <!-- Custom Music -->
           <div style="--card-bg-img: url('../assets/thumbnails/neural_geometric.png'); --card-hue: 280deg;" class="dash-card">
             <div class="card-header">
@@ -217,6 +267,24 @@
           </div>
 
         </div> <!-- /.dash-grid -->
+
+        <!-- Volume Mixer (Phase 4) -->
+        <div class="mixer-panel" id="mixer-panel">
+          <div class="card-header">
+            <span class="card-icon"><i data-lucide="sliders-horizontal" style="width: 16px; height: 16px;"></i></span>
+            <h3>Volume Mixer</h3>
+          </div>
+          <div id="mixer-rows">
+            <div class="mixer-row" data-layer="soundbank"><span class="mixer-label">Soundbank</span><input type="range" class="mixer-slider" min="0" max="100" value="50" data-layer="soundbank"><span class="mixer-value">50%</span></div>
+            <div class="mixer-row" data-layer="binaural"><span class="mixer-label">Binaural Beat</span><input type="range" class="mixer-slider" min="0" max="100" value="36" data-layer="binaural"><span class="mixer-value">36%</span></div>
+            <div class="mixer-row" data-layer="solfeggio"><span class="mixer-label">Solfeggio</span><input type="range" class="mixer-slider" min="0" max="100" value="20" data-layer="solfeggio"><span class="mixer-value">20%</span></div>
+            <div class="mixer-row" data-layer="nature"><span class="mixer-label">Nature</span><input type="range" class="mixer-slider" min="0" max="100" value="40" data-layer="nature"><span class="mixer-value">40%</span></div>
+            <div class="mixer-row" data-layer="noise"><span class="mixer-label">Noise</span><input type="range" class="mixer-slider" min="0" max="100" value="30" data-layer="noise"><span class="mixer-value">30%</span></div>
+            <div class="mixer-row" data-layer="synth"><span class="mixer-label">Synth</span><input type="range" class="mixer-slider" min="0" max="100" value="24" data-layer="synth"><span class="mixer-value">24%</span></div>
+            <div class="mixer-row" data-layer="isochronic"><span class="mixer-label">Isochronic</span><input type="range" class="mixer-slider" min="0" max="100" value="30" data-layer="isochronic"><span class="mixer-value">30%</span></div>
+            <div class="mixer-row" data-layer="music"><span class="mixer-label">Custom Music</span><input type="range" class="mixer-slider" min="0" max="100" value="70" data-layer="music"><span class="mixer-value">70%</span></div>
+          </div>
+        </div>
 
         <div class="dash-footer-bar">
           <div class="axiom-box">
@@ -240,6 +308,44 @@
 
       <!-- Protocol Cards (when Protocols tab active) -->
       <div id="protocol-list" class="hidden"></div>
+
+      <!-- Analytics Dashboard (Phase 3) -->
+      <div id="analytics-view">
+        <div class="analytics-header">
+          <h2>Analytics</h2>
+          <button class="export-btn" id="export-json-btn">
+            <i data-lucide="download" style="width: 14px; height: 14px;"></i> Export JSON
+          </button>
+        </div>
+        <div class="summary-grid" id="summary-grid">
+          <div class="summary-card"><div class="summary-value" id="a-total-min">0</div><div class="summary-label">Minutes This Week</div></div>
+          <div class="summary-card"><div class="summary-value" id="a-total-sessions">0</div><div class="summary-label">Sessions This Week</div></div>
+          <div class="summary-card"><div class="summary-value" id="a-avg-len">0</div><div class="summary-label">Avg Session (min)</div></div>
+          <div class="summary-card"><div class="summary-value" id="a-longest-streak">0</div><div class="summary-label">Longest Streak</div></div>
+        </div>
+        <div class="streak-calendar">
+          <h3>Session Activity (Last 90 Days)</h3>
+          <div class="calendar-months" id="calendar-months"></div>
+          <div class="calendar-grid" id="calendar-grid"></div>
+        </div>
+        <div class="trend-chart-wrap">
+          <h3>Daily Minutes (Last 30 Days)</h3>
+          <canvas class="trend-canvas" id="trend-canvas"></canvas>
+        </div>
+        <div class="history-table-wrap">
+          <h3>Session History</h3>
+          <table class="history-table" id="history-table">
+            <thead><tr>
+              <th data-sort="ts">Date <span class="sort-arrow">&#x25bc;</span></th>
+              <th data-sort="durationSec">Duration <span class="sort-arrow"></span></th>
+              <th data-sort="mode">Type <span class="sort-arrow"></span></th>
+              <th data-sort="axiom">Axiom <span class="sort-arrow"></span></th>
+              <th>Notes</th>
+            </tr></thead>
+            <tbody id="history-tbody"></tbody>
+          </table>
+        </div>
+      </div>
       
       <section id="zone">
          <div id="zone-idle" class="hidden"></div>
@@ -265,6 +371,11 @@
       <div id="lottie-viz" class="lottie-viz"></div>
       <div id="session-canvas-wrap"><canvas id="session-canvas"></canvas></div>
       <div id="session-axiom-overlay">I AM SOVEREIGN</div>
+      <!-- Breathing Guide Overlay (Phase 5) -->
+      <div class="breathing-guide hidden" id="breathing-guide">
+        <div class="breathing-circle" id="breathing-circle"></div>
+        <div class="breathing-text" id="breathing-text">INHALE</div>
+      </div>
       <div id="session-hud">
         <div class="session-timer" id="session-timer">00:00 / 10:00</div>
         <div class="session-progress-track"><div class="session-progress-fill" id="session-progress"></div></div>
@@ -284,13 +395,50 @@
       </div>
     </div>
 
+    <!-- VB Fullscreen Preview (Phase 6) -->
+    <div class="vb-fullscreen-overlay" id="vb-fullscreen">
+      <button class="vb-fullscreen-close" id="vb-fullscreen-close">&times;</button>
+      <img id="vb-fullscreen-img" src="" alt="Vision Board Preview">
+    </div>
+
     <!-- Settings Panel -->
     <div id="settings-panel">
-      <div class="settings-title">⚙ CONFIGURATION</div>
+      <div class="settings-title">&#x2699; CONFIGURATION</div>
       <div class="setting-group"><div class="setting-label">Wake Time</div><input type="time" class="setting-input" id="set-wake" value="06:00"></div>
       <div class="setting-group"><div class="setting-label">Axiom</div><input type="text" class="setting-input" id="set-axiom" value="I AM SOVEREIGN"></div>
       <div class="setting-group"><div class="setting-label">Carrier Frequency (Hz)</div><input type="number" class="setting-input" id="set-carrier" value="200" min="100" max="500"></div>
       <div class="setting-group"><div class="setting-label">Volume (0-0.3 max)</div><input type="number" class="setting-input" id="set-volume" value="0.25" min="0" max="0.3" step="0.05"></div>
+      <div class="setting-group">
+        <div class="setting-label">Guided Voice (TTS)</div>
+        <div class="setting-toggle">
+          <span style="font-size:12px; color:var(--text-secondary);">Speak axiom during session</span>
+          <label class="toggle-switch"><input type="checkbox" id="set-guided-voice"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+      <div class="setting-group">
+        <div class="setting-label">Voice Interval</div>
+        <select class="setting-input" id="set-voice-interval">
+          <option value="60">Every 60s</option>
+          <option value="120" selected>Every 120s</option>
+          <option value="300">Every 300s</option>
+        </select>
+      </div>
+      <div class="setting-group">
+        <div class="setting-label">Breathing Guide</div>
+        <select class="setting-input" id="set-breathing-pattern">
+          <option value="none">Off</option>
+          <option value="478">4-7-8 Relaxing</option>
+          <option value="box">Box Breathing (4-4-4-4)</option>
+          <option value="wim">Wim Hof (Rapid)</option>
+        </select>
+      </div>
+      <div class="setting-group">
+        <div class="setting-label">Session Reminder</div>
+        <div class="setting-toggle">
+          <span style="font-size:12px; color:var(--text-secondary);">Daily notification</span>
+          <label class="toggle-switch"><input type="checkbox" id="set-reminder"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
       <div style="margin-top:20px; font-size:12px; color:#A0A0A0; text-align:center;">Updates auto-save</div>
     </div>
 
@@ -305,6 +453,13 @@
   <script src="js/vision-board.js"></script>
   <script src="js/session.js"></script>
   <script src="js/protocols.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/presets.js"></script>
+  <script src="js/breathing.js"></script>
+  <script src="js/guided-voice.js"></script>
+  <script src="js/reminder.js"></script>
+  <script src="js/mixer.js"></script>
+  <script src="js/pwa.js"></script>
   <script src="js/app.js"></script>
   <script>lucide.createIcons();</script>
 </body>

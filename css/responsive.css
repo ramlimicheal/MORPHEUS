@@ -1,0 +1,772 @@
+/* =========================================
+   MORPHEUS — Mobile-First Responsive Overhaul
+   Phase 1: Complete responsive design system
+========================================= */
+
+/* ---- Mobile-First Base Overrides ---- */
+
+/* Hamburger Menu Button (mobile only) */
+.hamburger-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 8px;
+  z-index: 60;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Sidebar Overlay (mobile) */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 49;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.sidebar-overlay.visible {
+  opacity: 1;
+}
+
+/* PWA Install Banner */
+.pwa-install-banner {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border-bottom: 1px solid var(--border-strong);
+  padding: 12px 16px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text-primary);
+  animation: slideDown 0.3s ease-out;
+}
+.pwa-install-banner.visible {
+  display: flex;
+}
+.pwa-install-banner .pwa-install-text {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pwa-install-banner .pwa-install-btn {
+  background: var(--text-primary);
+  color: var(--bg-app);
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: 44px;
+  min-width: 44px;
+}
+.pwa-install-banner .pwa-dismiss-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 8px;
+  font-size: 16px;
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+/* ---- Volume Mixer Panel (Phase 4) ---- */
+.mixer-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.mixer-panel .card-header {
+  margin-bottom: 16px;
+}
+.mixer-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.mixer-row:last-child {
+  border-bottom: none;
+}
+.mixer-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  width: 100px;
+  flex-shrink: 0;
+}
+.mixer-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: var(--bg-input);
+  border-radius: 2px;
+  outline: none;
+}
+.mixer-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  cursor: pointer;
+  border: none;
+}
+.mixer-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  cursor: pointer;
+  border: none;
+}
+.mixer-value {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  width: 36px;
+  text-align: right;
+}
+
+/* ---- Preset Selector (Phase 5) ---- */
+.preset-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.preset-select {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  min-height: 44px;
+  cursor: pointer;
+  flex: 1;
+  min-width: 150px;
+}
+.preset-select:focus {
+  border-color: var(--border-strong);
+}
+.preset-save-btn {
+  background: var(--bg-input);
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  min-height: 44px;
+  white-space: nowrap;
+}
+.preset-save-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+/* ---- Breathing Guide Overlay (Phase 5) ---- */
+.breathing-guide {
+  position: absolute;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  pointer-events: none;
+}
+.breathing-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 1s ease-in-out, border-color 0.5s ease;
+}
+.breathing-circle.inhale {
+  transform: scale(1.8);
+  border-color: rgba(0, 240, 255, 0.6);
+}
+.breathing-circle.exhale {
+  transform: scale(0.6);
+  border-color: rgba(139, 92, 246, 0.6);
+}
+.breathing-circle.hold-breath {
+  border-color: rgba(16, 185, 129, 0.6);
+}
+.breathing-text {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-mono);
+}
+
+/* ---- Analytics Dashboard (Phase 3) ---- */
+#analytics-view {
+  padding: 30px 40px 100px 40px;
+  display: none;
+  flex-direction: column;
+  gap: 24px;
+}
+#analytics-view.visible {
+  display: flex;
+}
+
+.analytics-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.analytics-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+.summary-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.summary-card .summary-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+.summary-card .summary-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Streak Calendar */
+.streak-calendar {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+.streak-calendar h3 {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  gap: 3px;
+}
+.calendar-cell {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  background: var(--bg-input);
+  min-width: 0;
+}
+.calendar-cell.level-1 { background: rgba(16, 185, 129, 0.25); }
+.calendar-cell.level-2 { background: rgba(16, 185, 129, 0.5); }
+.calendar-cell.level-3 { background: rgba(16, 185, 129, 0.75); }
+.calendar-cell.level-4 { background: rgba(16, 185, 129, 1); }
+.calendar-cell.future { background: transparent; }
+.calendar-months {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  padding: 0 2px;
+}
+.calendar-months span {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+
+/* Trend Chart */
+.trend-chart-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+.trend-chart-wrap h3 {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+.trend-canvas {
+  width: 100%;
+  height: 150px;
+  display: block;
+}
+
+/* Session History Table */
+.history-table-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  overflow-x: auto;
+}
+.history-table-wrap h3 {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.history-table th {
+  text-align: left;
+  padding: 8px 12px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.history-table th:hover {
+  color: var(--text-secondary);
+}
+.history-table th .sort-arrow {
+  margin-left: 4px;
+  font-size: 10px;
+}
+.history-table td {
+  padding: 8px 12px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+.history-table tr:last-child td {
+  border-bottom: none;
+}
+.history-table .no-data {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-tertiary);
+}
+
+.export-btn {
+  background: var(--bg-input);
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.export-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+/* ---- Isochronic Selector (Phase 4) ---- */
+.isochronic-card .audio-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---- VB Fullscreen Preview (Phase 6) ---- */
+.vb-fullscreen-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+}
+.vb-fullscreen-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.vb-fullscreen-overlay img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+}
+.vb-fullscreen-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* VB Drag & Drop (Phase 6) */
+.vb-thumb {
+  cursor: grab;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.vb-thumb.dragging {
+  opacity: 0.5;
+  transform: scale(0.9);
+}
+.vb-thumb.drag-over {
+  border-color: var(--accent-blue);
+  transform: scale(1.05);
+}
+
+/* Ken Burns in session (Phase 6) */
+.vb-slide-layer {
+  animation: kenBurns 16s ease-in-out infinite alternate;
+}
+@keyframes kenBurns {
+  0% { transform: scale(1) translate(0, 0); }
+  25% { transform: scale(1.08) translate(-1%, 1%); }
+  50% { transform: scale(1.12) translate(1%, -1%); }
+  75% { transform: scale(1.06) translate(-0.5%, 0.5%); }
+  100% { transform: scale(1.15) translate(1%, 1%); }
+}
+
+/* ---- Settings additions (Phase 5) ---- */
+.setting-group .setting-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: var(--bg-input);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  transition: var(--transition);
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 2px;
+  bottom: 2px;
+  background: var(--text-secondary);
+  border-radius: 50%;
+  transition: var(--transition);
+}
+.toggle-switch input:checked + .toggle-slider {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+}
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(20px);
+  background: #fff;
+}
+
+/* =========================================
+   MOBILE RESPONSIVE (< 768px)
+========================================= */
+@media (max-width: 767px) {
+  html, body {
+    height: 100%;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  #app {
+    height: 100dvh;
+    flex-direction: column;
+  }
+
+  /* Hamburger visible */
+  .hamburger-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Sidebar becomes slide-out drawer */
+  .sidebar {
+    position: fixed;
+    left: -280px;
+    top: 0;
+    bottom: 0;
+    width: 280px;
+    z-index: 50;
+    transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    padding-top: env(safe-area-inset-top, 24px);
+  }
+  .sidebar.open {
+    left: 0;
+  }
+  .sidebar-overlay {
+    display: block;
+    pointer-events: none;
+  }
+  .sidebar-overlay.visible {
+    pointer-events: auto;
+  }
+
+  /* Main content takes full width */
+  .dashboard-content {
+    width: 100%;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Topbar adjustments */
+  .topbar {
+    padding: 12px 16px;
+    gap: 8px;
+  }
+  .page-title {
+    font-size: 16px;
+  }
+  #ultradian-wrap {
+    display: none;
+  }
+
+  /* Grid single column */
+  #session-setup {
+    padding: 16px 16px 120px 16px;
+  }
+  .dash-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .span-2 {
+    grid-column: span 1;
+  }
+
+  /* Cards */
+  .dash-card {
+    padding: 16px;
+  }
+
+  /* Touch-friendly buttons */
+  .freq-btn {
+    padding: 10px 14px;
+    font-size: 13px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .soundbank-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+
+  /* Footer bar (bottom action bar) */
+  .dash-footer-bar {
+    left: 0;
+    padding: 12px 16px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .axiom-box {
+    flex: 1 1 100%;
+    min-height: 44px;
+  }
+  .duration-box {
+    flex: 1;
+  }
+  .begin-btn {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 0 16px;
+    font-size: 13px;
+  }
+  .dur-btn {
+    padding: 10px 12px;
+    min-height: 44px;
+  }
+
+  /* Session overlay mobile */
+  #session-active {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  #session-axiom-overlay {
+    font-size: 6vw;
+    padding: 0 16px;
+  }
+  #session-hud {
+    bottom: 20px;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    width: 90%;
+  }
+  .session-progress-track {
+    width: 100%;
+  }
+  #session-end-btn {
+    min-height: 44px;
+    padding: 12px 32px;
+    font-size: 13px;
+  }
+
+  /* Journal modal */
+  .journal-box {
+    width: calc(100vw - 32px);
+    max-width: 500px;
+    padding: 24px;
+    margin: 16px;
+  }
+
+  /* Settings panel */
+  #settings-panel {
+    width: 100%;
+    right: -100%;
+  }
+
+  /* Analytics */
+  #analytics-view {
+    padding: 16px 16px 120px 16px;
+  }
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .summary-card .summary-value {
+    font-size: 22px;
+  }
+  .calendar-grid {
+    gap: 2px;
+  }
+
+  /* Protocol list */
+  #protocol-list {
+    padding: 16px;
+  }
+  #zone {
+    padding: 0 16px 16px 16px;
+  }
+
+  /* VB grid mobile */
+  .vb-thumb {
+    width: 50px;
+    height: 50px;
+  }
+
+  /* Mixer panel mobile */
+  .mixer-label {
+    width: 70px;
+    font-size: 11px;
+  }
+
+  /* Breathing guide mobile */
+  .breathing-guide {
+    bottom: 100px;
+  }
+  .breathing-circle {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* =========================================
+   TABLET (768px - 1024px)
+========================================= */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .dash-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .span-2 {
+    grid-column: span 2;
+  }
+  .summary-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* =========================================
+   DESKTOP (>= 768px)
+========================================= */
+@media (min-width: 768px) {
+  .sidebar-overlay {
+    display: none !important;
+  }
+  .hamburger-btn {
+    display: none !important;
+  }
+}

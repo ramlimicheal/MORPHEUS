@@ -21,6 +21,7 @@
       this._solfreq = 'none';
       this._synthMood = 'none';
       this._bankKey = 'none';
+      this._isoType = 'none';
     }
 
     init() {
@@ -38,10 +39,63 @@
       this._renderMetrics();
       this._updateUltradian();
       this._bindSettings();
+      this._bindMobile();
+      this._bindVBFullscreen();
       this.viz.start();
+
+      // Initialize new modules
+      if (MORPHEUS.Analytics) MORPHEUS.Analytics.init();
+      if (MORPHEUS.Presets) MORPHEUS.Presets.init();
+      if (MORPHEUS.Breathing) MORPHEUS.Breathing.init();
+      if (MORPHEUS.GuidedVoice) MORPHEUS.GuidedVoice.init();
+      if (MORPHEUS.Reminder) MORPHEUS.Reminder.init();
+      if (MORPHEUS.Mixer) MORPHEUS.Mixer.init();
+
+      // Hide analytics view initially
+      var analyticsView = document.getElementById('analytics-view');
+      if (analyticsView) analyticsView.style.display = 'none';
 
       setInterval(() => this._updateUltradian(), 30000);
       setInterval(() => this._renderMetrics(), 10000);
+    }
+
+    // ===== MOBILE HAMBURGER & SIDEBAR =====
+    _bindMobile() {
+      var hamburger = document.getElementById('hamburger-btn');
+      var sidebar = document.querySelector('.sidebar');
+      var overlay = document.getElementById('sidebar-overlay');
+      if (hamburger && sidebar) {
+        hamburger.addEventListener('click', () => {
+          sidebar.classList.toggle('open');
+          if (overlay) overlay.classList.toggle('visible', sidebar.classList.contains('open'));
+        });
+      }
+      if (overlay) {
+        overlay.addEventListener('click', () => {
+          if (sidebar) sidebar.classList.remove('open');
+          overlay.classList.remove('visible');
+        });
+      }
+    }
+
+    // ===== VB FULLSCREEN PREVIEW =====
+    _bindVBFullscreen() {
+      var fsOverlay = document.getElementById('vb-fullscreen');
+      var fsImg = document.getElementById('vb-fullscreen-img');
+      var fsClose = document.getElementById('vb-fullscreen-close');
+      if (fsClose && fsOverlay) {
+        fsClose.addEventListener('click', () => fsOverlay.classList.remove('visible'));
+        fsOverlay.addEventListener('click', (e) => { if (e.target === fsOverlay) fsOverlay.classList.remove('visible'); });
+      }
+    }
+
+    _openVBFullscreen(url) {
+      var fsOverlay = document.getElementById('vb-fullscreen');
+      var fsImg = document.getElementById('vb-fullscreen-img');
+      if (fsOverlay && fsImg) {
+        fsImg.src = url;
+        fsOverlay.classList.add('visible');
+      }
     }
 
     // ===== TABS =====
@@ -54,6 +108,19 @@
           document.getElementById('session-setup').classList.toggle('visible', this.activeTab === 'session');
           document.getElementById('session-setup').classList.toggle('hidden', this.activeTab !== 'session');
           document.getElementById('protocol-list').classList.toggle('hidden', this.activeTab !== 'protocols');
+
+          // Analytics view toggle
+          var analyticsView = document.getElementById('analytics-view');
+          if (analyticsView) {
+            analyticsView.style.display = this.activeTab === 'analytics' ? 'block' : 'none';
+            if (this.activeTab === 'analytics' && MORPHEUS.Analytics) MORPHEUS.Analytics.render();
+          }
+
+          // Close mobile sidebar on tab click
+          var sidebar = document.querySelector('.sidebar');
+          var overlay = document.getElementById('sidebar-overlay');
+          if (sidebar) sidebar.classList.remove('open');
+          if (overlay) overlay.classList.remove('visible');
         });
       });
     }
@@ -118,11 +185,20 @@
       });
 
       // Ambient layer selectors
-      this._bindSelectorGroup('#bank-selector', 'bank', v => this._bankKey = v);
+      this._bindSelectorGroup('#bank-selector', 'bank', v => {
+        // Crossfade when changing banks during session
+        if (this.session && this.session.running && this._bankKey !== 'none' && v !== 'none' && v !== this._bankKey) {
+          this.ambient.crossfadeBank(v, 3, 0.25);
+        }
+        this._bankKey = v;
+      });
       this._bindSelectorGroup('#ambient-selector', 'ambient', v => this._ambientType = v);
       this._bindSelectorGroup('#noise-selector', 'noise', v => this._noiseType = v);
       this._bindSelectorGroup('#solfeggio-selector', 'sol', v => this._solfreq = v);
       this._bindSelectorGroup('#synth-selector', 'synth', v => this._synthMood = v);
+
+      // Isochronic selector
+      this._bindSelectorGroup('#iso-selector', 'iso', v => this._isoType = v);
 
       // Begin session
       document.getElementById('begin-session').addEventListener('click', () => this._startSession());
@@ -141,7 +217,7 @@
       });
     }
 
-    // ===== VISION BOARD GRID =====
+    // ===== VISION BOARD GRID (with drag & drop) =====
     _renderVBGrid() {
       const grid = document.getElementById('vb-grid');
       grid.innerHTML = '';
@@ -149,6 +225,34 @@
         const thumb = document.createElement('div');
         thumb.className = 'vb-thumb';
         thumb.style.backgroundImage = `url(${url})`;
+        thumb.draggable = true;
+        thumb.dataset.idx = i;
+
+        // Drag & drop reorder
+        thumb.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', i);
+          thumb.classList.add('dragging');
+        });
+        thumb.addEventListener('dragend', () => thumb.classList.remove('dragging'));
+        thumb.addEventListener('dragover', (e) => { e.preventDefault(); thumb.classList.add('drag-over'); });
+        thumb.addEventListener('dragleave', () => thumb.classList.remove('drag-over'));
+        thumb.addEventListener('drop', (e) => {
+          e.preventDefault();
+          thumb.classList.remove('drag-over');
+          const fromIdx = parseInt(e.dataTransfer.getData('text/plain'), 10);
+          const toIdx = i;
+          if (fromIdx !== toIdx) {
+            this.vb.reorder(fromIdx, toIdx);
+            this._renderVBGrid();
+          }
+        });
+
+        // Fullscreen preview on click
+        thumb.addEventListener('click', (e) => {
+          if (e.target.classList.contains('vb-remove')) return;
+          this._openVBFullscreen(url);
+        });
+
         const rm = document.createElement('button');
         rm.className = 'vb-remove';
         rm.textContent = '✕';
@@ -217,6 +321,12 @@
         });
       };
 
+      // Connect AnalyserNode to session visualizer for real FFT
+      var analyser = this.audio.getAnalyser();
+      if (analyser && this.sessionViz) {
+        this.sessionViz.setAnalyser(analyser);
+      }
+
       // Start Endel sound bank
       if (this._bankKey !== 'none') {
         this.ambient.playBank(this._bankKey, 0.25);
@@ -229,6 +339,24 @@
       if (this._solfreq !== 'none') this.ambient.playSolfeggio(this._solfreq, 0.1);
       if (this._synthMood !== 'none') this.ambient.startGenerative('C', this._synthMood, 0.12);
 
+      // Start isochronic tones
+      if (this._isoType !== 'none') {
+        var isoMap = { delta: 2, theta: 6, alpha: 10, beta: 20 };
+        var pulseHz = isoMap[this._isoType] || 6;
+        this.audio.playIsochronal(settings.carrierFreq || 200, pulseHz);
+      }
+
+      // Start breathing guide
+      var breathPattern = document.getElementById('set-breathing-pattern');
+      if (breathPattern && breathPattern.value !== 'none' && MORPHEUS.Breathing) {
+        MORPHEUS.Breathing.start(breathPattern.value);
+      }
+
+      // Start guided voice TTS
+      if (MORPHEUS.GuidedVoice && MORPHEUS.GuidedVoice.isEnabled()) {
+        MORPHEUS.GuidedVoice.start(axiom);
+      }
+
       // Tap interaction on session canvas
       overlay.addEventListener('click', this._tapHandler = () => this.ambient.playTap());
 
@@ -237,8 +365,13 @@
 
     _endSession() {
       this.session.stop();
-      this.ambient.stopAll();
-      if (this.sessionViz) { this.sessionViz.stop(); this.sessionViz = null; }
+      // Crossfade stop all ambient layers
+      this.ambient.crossfadeStopAll(3);
+      if (this.sessionViz) { this.sessionViz.setAnalyser(null); this.sessionViz.stop(); this.sessionViz = null; }
+
+      // Stop breathing guide and guided voice
+      if (MORPHEUS.Breathing) MORPHEUS.Breathing.stop();
+      if (MORPHEUS.GuidedVoice) MORPHEUS.GuidedVoice.stop();
 
       const overlay = document.getElementById('session-active');
       overlay.removeEventListener('click', this._tapHandler);
@@ -247,6 +380,9 @@
 
       document.getElementById('session-progress').style.width = '0%';
       this._renderMetrics();
+
+      // Refresh analytics if visible
+      if (MORPHEUS.Analytics && this.activeTab === 'analytics') MORPHEUS.Analytics.render();
     }
 
     // ===== PROTOCOL NAV =====
