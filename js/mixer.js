@@ -32,13 +32,15 @@
 
     switch(layer) {
       case 'soundbank':
-        if (AE.bankGain) AE.bankGain.gain.value = val;
+        if (AMB && AMB._nodes && AMB._nodes.bank && AMB._nodes.bank.gain) AMB._nodes.bank.gain.gain.value = val;
         break;
       case 'binaural':
         if (AE.binauralGain) AE.binauralGain.gain.value = val;
         break;
       case 'solfeggio':
-        if (AE.solfGain) AE.solfGain.gain.value = val;
+        if (AMB && AMB._nodes && AMB._nodes.solfeggio && AMB._nodes.solfeggio.gains) {
+          AMB._nodes.solfeggio.gains.forEach(function(g) { g.gain.value = val; });
+        }
         break;
       case 'nature':
         if (AMB && AMB.natureGain) AMB.natureGain.gain.value = val;
@@ -53,7 +55,8 @@
         if (AE.isoGain) AE.isoGain.gain.value = val;
         break;
       case 'music':
-        if (AE.musicGain) AE.musicGain.gain.value = val;
+        var session = app ? app.session : null;
+        if (session && session._musicGain) session._musicGain.gain.value = val;
         break;
     }
   }

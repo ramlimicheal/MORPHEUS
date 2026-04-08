@@ -18,20 +18,20 @@
     var config = {};
 
     // Soundbank
-    var activeBank = document.querySelector('.card-btn.active-btn');
+    var activeBank = document.querySelector('#bank-selector .freq-btn.active');
     if (activeBank) config.soundbank = activeBank.getAttribute('data-bank');
 
     // Binaural
-    var activeBin = document.querySelector('#binaural-selector .freq-btn.active');
-    if (activeBin) config.binaural = activeBin.getAttribute('data-hz');
+    var activeBin = document.querySelector('#session-freq-selector .freq-btn.active');
+    if (activeBin) config.binaural = activeBin.getAttribute('data-freq');
 
     // Solfeggio
-    var activeSolf = document.querySelector('.solfeggio-btn.active');
-    if (activeSolf) config.solfeggio = activeSolf.getAttribute('data-freq');
+    var activeSolf = document.querySelector('#solfeggio-selector .freq-btn.active');
+    if (activeSolf) config.solfeggio = activeSolf.getAttribute('data-sol');
 
     // Nature
-    var activeNature = document.querySelector('#nature-selector .freq-btn.active');
-    if (activeNature) config.nature = activeNature.getAttribute('data-nature');
+    var activeNature = document.querySelector('#ambient-selector .freq-btn.active');
+    if (activeNature) config.nature = activeNature.getAttribute('data-ambient');
 
     // Noise
     var activeNoise = document.querySelector('#noise-selector .freq-btn.active');
@@ -42,12 +42,12 @@
     if (activeIso) config.isochronic = activeIso.getAttribute('data-iso');
 
     // Axiom
-    var axiomEl = document.getElementById('set-axiom');
+    var axiomEl = document.getElementById('session-axiom');
     if (axiomEl) config.axiom = axiomEl.value;
 
     // Duration
-    var durEl = document.getElementById('duration-slider');
-    if (durEl) config.duration = durEl.value;
+    var activeDur = document.querySelector('.dur-btn.active');
+    if (activeDur) config.duration = activeDur.getAttribute('data-dur');
 
     // Mixer volumes
     var sliders = document.querySelectorAll('.mixer-slider');
@@ -66,25 +66,25 @@
 
     // Soundbank
     if (config.soundbank) {
-      var btn = document.querySelector('.card-btn[data-bank="' + config.soundbank + '"]');
+      var btn = document.querySelector('#bank-selector .freq-btn[data-bank="' + config.soundbank + '"]');
       if (btn) btn.click();
     }
 
     // Binaural
     if (config.binaural) {
-      var bin = document.querySelector('#binaural-selector .freq-btn[data-hz="' + config.binaural + '"]');
+      var bin = document.querySelector('#session-freq-selector .freq-btn[data-freq="' + config.binaural + '"]');
       if (bin) bin.click();
     }
 
     // Solfeggio
     if (config.solfeggio) {
-      var solf = document.querySelector('.solfeggio-btn[data-freq="' + config.solfeggio + '"]');
+      var solf = document.querySelector('#solfeggio-selector .freq-btn[data-sol="' + config.solfeggio + '"]');
       if (solf) solf.click();
     }
 
     // Nature
     if (config.nature) {
-      var nat = document.querySelector('#nature-selector .freq-btn[data-nature="' + config.nature + '"]');
+      var nat = document.querySelector('#ambient-selector .freq-btn[data-ambient="' + config.nature + '"]');
       if (nat) nat.click();
     }
 
@@ -102,7 +102,7 @@
 
     // Axiom
     if (config.axiom) {
-      var axiomEl = document.getElementById('set-axiom');
+      var axiomEl = document.getElementById('session-axiom');
       if (axiomEl) {
         axiomEl.value = config.axiom;
         axiomEl.dispatchEvent(new Event('change'));
@@ -111,11 +111,8 @@
 
     // Duration
     if (config.duration) {
-      var durEl = document.getElementById('duration-slider');
-      if (durEl) {
-        durEl.value = config.duration;
-        durEl.dispatchEvent(new Event('input'));
-      }
+      var durBtn = document.querySelector('.dur-btn[data-dur="' + config.duration + '"]');
+      if (durBtn) durBtn.click();
     }
 
     // Mixer

@@ -211,7 +211,7 @@
         '<td>' + dur + 'm</td>' +
         '<td>' + (s.mode || 'session') + '</td>' +
         '<td>' + (s.axiom || '-') + '</td>' +
-        '<td>' + (s.journal || '-').substring(0, 50) + '</td>';
+        '<td>' + (s.notes || '-').substring(0, 50) + '</td>';
       tbody.appendChild(tr);
     });
   }
