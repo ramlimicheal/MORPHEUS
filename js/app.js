@@ -112,7 +112,7 @@
           // Analytics view toggle
           var analyticsView = document.getElementById('analytics-view');
           if (analyticsView) {
-            analyticsView.style.display = this.activeTab === 'analytics' ? 'block' : 'none';
+            analyticsView.style.display = this.activeTab === 'analytics' ? 'flex' : 'none';
             if (this.activeTab === 'analytics' && MORPHEUS.Analytics) MORPHEUS.Analytics.render();
           }
 
@@ -365,6 +365,8 @@
 
     _endSession() {
       this.session.stop();
+      // Stop isochronic tones from AudioEngine
+      this.audio.stop();
       // Crossfade stop all ambient layers
       this.ambient.crossfadeStopAll(3);
       if (this.sessionViz) { this.sessionViz.setAnalyser(null); this.sessionViz.stop(); this.sessionViz = null; }

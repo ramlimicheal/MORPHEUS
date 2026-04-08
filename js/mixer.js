@@ -23,9 +23,10 @@
   }
 
   function applyVolume(layer, val) {
-    // Apply to audio engine gain nodes if available
-    var AE = MORPHEUS.AudioEngine;
-    var AMB = MORPHEUS.AmbientEngine;
+    // Apply to audio engine gain nodes if available (use running instances, not constructors)
+    var app = MORPHEUS.app;
+    var AE = app ? app.audio : null;
+    var AMB = app ? app.ambient : null;
 
     if (!AE) return;
 
