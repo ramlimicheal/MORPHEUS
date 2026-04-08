@@ -17,6 +17,8 @@
       this.running = false;
       this.lottieInstance = null;
       this.lottieContainer = document.getElementById('lottie-viz');
+      this._analyser = null;
+      this._fftData = null;
       this._resize();
       this._initParticles(70);
       window.addEventListener('resize', () => this._resize());
@@ -186,10 +188,59 @@
       }
     }
 
+    setAnalyser(analyserNode) {
+      this._analyser = analyserNode;
+      if (analyserNode) {
+        this._fftData = new Uint8Array(analyserNode.frequencyBinCount);
+      }
+    }
+
     _drawWaveform() {
       const { ctx, w, h, cx, cy, color, time, intensity } = this;
+
+      // Use real FFT data if analyser is connected
+      if (this._analyser && this._fftData) {
+        this._analyser.getByteFrequencyData(this._fftData);
+        const bins = this._fftData;
+        const barCount = Math.min(bins.length, 64);
+        const barW = w / barCount;
+
+        // Frequency bars
+        for (let i = 0; i < barCount; i++) {
+          const val = bins[i] / 255;
+          const barH = val * (h * 0.5) * intensity;
+          const x = i * barW;
+
+          const gradient = ctx.createLinearGradient(x, cy - barH, x, cy + barH);
+          gradient.addColorStop(0, `rgba(${color.r},${color.g},${color.b},${val * 0.6})`);
+          gradient.addColorStop(0.5, `rgba(139,92,246,${val * 0.4})`);
+          gradient.addColorStop(1, `rgba(${color.r},${color.g},${color.b},${val * 0.2})`);
+          ctx.fillStyle = gradient;
+
+          // Mirror bars from center
+          ctx.fillRect(x, cy - barH / 2, barW - 1, barH);
+        }
+
+        // Waveform line on top of bars
+        this._analyser.getByteTimeDomainData(this._fftData);
+        ctx.beginPath();
+        const sliceW = w / bins.length;
+        for (let i = 0; i < bins.length; i++) {
+          const v = bins[i] / 128.0;
+          const y = cy + (v - 1) * (h * 0.25) * intensity;
+          i === 0 ? ctx.moveTo(i * sliceW, y) : ctx.lineTo(i * sliceW, y);
+        }
+        ctx.strokeStyle = `rgba(${color.r},${color.g},${color.b},0.6)`;
+        ctx.lineWidth = 2; ctx.stroke();
+
+        // Center glow based on average amplitude
+        const avg = bins.reduce((a, b) => a + b, 0) / bins.length / 255;
+        this._orb(cx, cy, 15 + avg * 40, 0.2 + avg * 0.3);
+        return;
+      }
+
+      // Fallback: synthetic waveform (no analyser connected)
       const amp = 35 * intensity;
-      // Left channel wave
       ctx.beginPath();
       for (let x = 0; x < w; x++) {
         const y = cy - 25 + Math.sin(x * 0.02 + time * 3) * amp;
@@ -197,7 +248,6 @@
       }
       ctx.strokeStyle = `rgba(${color.r},${color.g},${color.b},0.45)`;
       ctx.lineWidth = 2; ctx.stroke();
-      // Right channel wave (offset beat)
       ctx.beginPath();
       for (let x = 0; x < w; x++) {
         const y = cy + 25 + Math.sin(x * 0.02 + time * 3.4) * amp * 0.8;
@@ -205,7 +255,6 @@
       }
       ctx.strokeStyle = 'rgba(139,92,246,0.35)';
       ctx.lineWidth = 2; ctx.stroke();
-      // Beat interference glow
       const beatR = Math.abs(Math.sin(time * 0.5)) * 40 + 15;
       this._orb(cx, cy, beatR, 0.3);
     }

@@ -68,6 +68,9 @@
       this._active = new Set();
       this._bufferCache = {};
       this._lottieInstances = {};
+      this.natureGain = null;
+      this.noiseGain = null;
+      this.synthGain = null;
     }
 
     _ensure() {
@@ -118,6 +121,24 @@
       return bankKey;
     }
 
+    // Crossfade to a new bank over duration seconds
+    async crossfadeBank(newBankKey, duration = 3, volume = 0.3) {
+      this._ensure();
+      var oldNode = this._nodes.bank;
+      if (oldNode && oldNode.gain) {
+        var now = this.ctx.currentTime;
+        oldNode.gain.gain.linearRampToValueAtTime(0, now + duration);
+        var oldSource = oldNode.source;
+        setTimeout(function() {
+          try { oldSource.stop(); } catch(e) {}
+          try { oldSource.disconnect(); } catch(e) {}
+        }, duration * 1000 + 100);
+      }
+      delete this._nodes.bank;
+      this._active.delete('bank');
+      return this.playBank(newBankKey, volume);
+    }
+
     // ================================================
     // COLOR NOISE (Synthesized — no Endel files needed)
     // ================================================
@@ -161,6 +182,7 @@
       source.connect(gain).connect(this.ctx.destination);
       source.start();
       this._nodes.noise = { source, gain };
+      this.noiseGain = gain;
       this._active.add('noise');
     }
 
@@ -180,6 +202,30 @@
       // Synth fallback for rain, ocean, wind, fire
       this._synthNature(type, volume);
       this._active.add('nature');
+    }
+
+    // Crossfade stop all layers over duration seconds
+    crossfadeStopAll(duration = 3) {
+      if (!this.ctx) return;
+      var self = this;
+      var now = this.ctx.currentTime;
+      var activeNames = [].concat(Array.from(this._active));
+      activeNames.forEach(function(name) {
+        var node = self._nodes[name];
+        if (!node) return;
+        if (node.gain) {
+          node.gain.gain.linearRampToValueAtTime(0, now + duration);
+        }
+        if (node.gains) {
+          node.gains.forEach(function(g) { g.gain.linearRampToValueAtTime(0, now + duration); });
+        }
+        if (node.masterGain) {
+          node.masterGain.gain.linearRampToValueAtTime(0, now + duration);
+        }
+      });
+      setTimeout(function() {
+        self.stopAll();
+      }, duration * 1000 + 200);
     }
 
     _synthNature(type, vol) {
@@ -229,6 +275,7 @@
       src.connect(filter).connect(gain).connect(this.ctx.destination);
       lfo.start(); src.start();
       this._nodes.nature = { source: src, gain, extra: [lfo, lfoGain, filter] };
+      this.natureGain = gain;
     }
 
     // ================================================
@@ -312,6 +359,7 @@
       masterGain.connect(this.ctx.destination);
 
       this._nodes.generative = { delay, feedback, masterGain, _timer: null };
+      this.synthGain = masterGain;
       this._active.add('generative');
 
       try {
