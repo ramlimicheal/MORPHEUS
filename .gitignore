@@ -1,0 +1,9 @@
+# Large binary assets that exceed GitHub's 100MB limit
+competitive_analysis/
+assets/audio/relax.opus
+assets/audio/*.opus
+
+# OS files
+.DS_Store
+__pycache__/
+*.pyc

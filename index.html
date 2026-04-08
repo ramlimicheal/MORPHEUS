@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MORPHEUS — Neural Sovereignty Engine</title>
+  <meta name="description" content="Reprogram your subconscious with your own music, vision board, and axioms. Real neuroscience. 10 minutes a day.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+  <link rel="stylesheet" href="css/morpheus.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div id="protocol-warning" style="display: none; position: fixed; inset: 0; z-index: 9999; background: #0a0a0f; color: #f43f5e; padding: 40px; font-family: monospace; text-align: center; justify-content: center; flex-direction: column;">
+    <h1 style="margin-bottom: 20px;">🛑 MORPHEUS ENGINE BLOCKED</h1>
+    <p>You opened this file directly <b>(file:// protocol)</b>.</p>
+    <p>The Web Audio API will <b>BLOCK</b> the Endel Sound Banks from loading due to strict browser CORS security policies.</p>
+    <div style="margin-top: 30px; padding: 20px; border: 1px dashed #f43f5e; display: inline-block;">
+      <h3>TO ACTIVATE AUDIO ENGINE:</h3>
+      <p>1. Open your terminal in the <b>Desktop/Alpha/MORPHEUS</b> folder</p>
+      <p>2. Run: <b>./start_engine.sh</b> <span style="color: #94a3b8;">(or python3 -m http.server 8888)</span></p>
+      <p>3. Navigate to <b>http://localhost:8888</b></p>
+    </div>
+  </div>
+  <script>if(window.location.protocol==='file:'){document.getElementById('protocol-warning').style.display='flex';}</script>
+
+  <div id="app">
+    <!-- DASHBOARD SIDEBAR -->
+    <aside class="sidebar" id="protocol-nav">
+      <div class="sidebar-header">
+        <div class="logo-icon">M</div>
+        <div class="logo-text">
+          <div class="logo-title">Morpheus</div>
+          <div class="logo-subtitle">Neural Engine</div>
+        </div>
+      </div>
+      
+      <!-- Search bar mock (from screenshot) -->
+      <div class="search-wrap">
+        <span class="search-icon"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
+        <input type="text" class="search-input" placeholder="Search configs...">
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">Core</div>
+        <button class="nav-tab active" data-tab="session">
+          <span class="nav-icon"><i data-lucide="zap" style="width: 14px; height: 14px;"></i></span> Configuration
+        </button>
+        <button class="nav-tab" data-tab="protocols">
+          <span class="nav-icon"><i data-lucide="brain" style="width: 14px; height: 14px;"></i></span> Protocols
+        </button>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">Analysis</div>
+        <div class="metric-mini">
+          <span class="metric-label">Sessions</span>
+          <span class="metric-val" id="m-total">0</span>
+        </div>
+        <div class="metric-mini">
+          <span class="metric-label">Streak</span>
+          <span class="metric-val" id="m-streak">0d</span>
+        </div>
+        <div class="metric-mini">
+          <span class="metric-label">Hold</span>
+          <span class="metric-val" id="m-hold">0m</span>
+        </div>
+      </div>
+
+      <div class="nav-section" style="margin-top: auto">
+        <div class="nav-label">System</div>
+        <button class="nav-tab" id="settings-btn">
+          <span class="nav-icon"><i data-lucide="settings" style="width: 14px; height: 14px;"></i></span> Settings
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="dashboard-content" id="main">
+      <div class="topbar">
+        <h1 class="page-title">Session Configuration</h1>
+        <div id="ultradian-wrap">
+          <span id="ultradian-label">Cycle 1 · RAMP · 0/90min</span>
+          <div id="ultradian-track"><div id="ultradian-fill" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <!-- Session Setup Grid -->
+      <div id="session-setup" class="visible">
+        <div class="dash-grid">
+          
+          <div style="--card-bg-img: url('../assets/thumbnails/abstract_nebula.png'); --card-hue: 0deg;" class="dash-card span-2">
+            <div class="card-header">
+              <span class="card-icon"><i data-lucide="headphones" style="width: 16px; height: 16px;"></i></span>
+              <h3>Sound Atmospheres</h3>
+            </div>
+            <p class="card-desc">Studio-grade Endel ambient soundscapes. Overrides standard synth.</p>
+            <div class="audio-controls soundbank-grid" id="bank-selector">
+              <button class="freq-btn active" data-bank="none">None</button>
+              <button class="freq-btn" data-bank="focus">Focus</button>
+              <button class="freq-btn" data-bank="sleep">Sleep</button>
+              <button class="freq-btn" data-bank="binaural">Binaural</button>
+              <button class="freq-btn" data-bank="nature">Nature</button>
+              <button class="freq-btn" data-bank="brain_massage">Brain Massage</button>
+              <button class="freq-btn" data-bank="creativity">Creativity</button>
+              <button class="freq-btn" data-bank="relax">Deep Relax</button>
+              <button class="freq-btn" data-bank="calming_freq">Calming Freq</button>
+              <button class="freq-btn" data-bank="asmr">ASMR</button>
+              <button class="freq-btn" data-bank="spatial_8d">8D Spatial</button>
+              <button class="freq-btn" data-bank="tinnitus">Tinnitus</button>
+            </div>
+          </div>
+
+          <!-- Vision Board -->
+          <div style="--card-bg-img: url('../assets/thumbnails/neural_geometric.png'); --card-hue: 180deg;" class="dash-card span-2">
+            <div class="card-header">
+              <span class="card-icon"><i data-lucide="eye" style="width: 16px; height: 16px;"></i></span>
+              <h3>Vision Board</h3>
+            </div>
+            <p class="card-desc">Images of your desired reality. Max 8.</p>
+            <div class="vb-grid" id="vb-grid"></div>
+            <label class="file-upload-btn small-btn">
+              <span>+ Add Images</span>
+              <input type="file" accept="image/*" id="vb-file-input" style="display:none" multiple>
+            </label>
+          </div>
+
+          <!-- Generative Synth -->
+          <div style="--card-bg-img: url('../assets/thumbnails/dark_fluid.png'); --card-hue: 60deg;" class="dash-card">
+            <div class="card-header">
+              <span class="card-icon"><i data-lucide="audio-lines" style="width: 16px; height: 16px;"></i></span>
+              <h3>Generative Synth</h3>
+            </div>
+            <p class="card-desc">MIDI sequence ambient melody.</p>
+            <div class="audio-controls" id="synth-selector">
+              <button class="freq-btn active" data-synth="none">None</button>
+              <button class="freq-btn" data-synth="calm">Calm</button>
+              <button class="freq-btn" data-synth="dark">Dark</button>
+              <button class="freq-btn" data-synth="ethereal">Ethereal</button>
+            </div>
+          </div>
+
+          <!-- Beat Frequency -->
+          <div style="--card-bg-img: url('../assets/thumbnails/abstract_nebula.png'); --card-hue: 220deg;" class="dash-card">
+             <div class="card-header">
+              <span class="card-icon"><i data-lucide="brain" style="width: 16px; height: 16px;"></i></span>
+              <h3>Binaural Beat</h3>
+            </div>
+            <p class="card-desc">Pure sine wave differential layer.</p>
+            <div class="audio-controls" id="session-freq-selector">
+              <button class="freq-btn active" data-freq="none">None</button>
+              <button class="freq-btn" data-freq="delta">Delta 2Hz</button>
+              <button class="freq-btn" data-freq="theta">Theta 6Hz</button>
+              <button class="freq-btn" data-freq="alpha">Alpha 10Hz</button>
+              <button class="freq-btn" data-freq="beta">Beta 20Hz</button>
+            </div>
+          </div>
+          
+          <!-- Solfeggio -->
+          <div style="--card-bg-img: url('../assets/thumbnails/neural_geometric.png'); --card-hue: 50deg;" class="dash-card">
+            <div class="card-header">
+              <span class="card-icon"><i data-lucide="bell" style="width: 16px; height: 16px;"></i></span>
+              <h3>Solfeggio Freq</h3>
+            </div>
+            <p class="card-desc">Ancient healing resonant tunings.</p>
+            <div class="audio-controls" id="solfeggio-selector">
+              <button class="freq-btn active" data-sol="none">None</button>
+              <button class="freq-btn" data-sol="432">432Hz</button>
+              <button class="freq-btn" data-sol="528">528Hz</button>
+              <button class="freq-btn" data-sol="396">396Hz</button>
+              <button class="freq-btn" data-sol="963">963Hz</button>
+            </div>
+          </div>
+
+          <!-- Nature Layer -->
+          <div style="--card-bg-img: url('../assets/thumbnails/dark_fluid.png'); --card-hue: 120deg;" class="dash-card">
+            <div class="card-header">
+              <span class="card-icon"><i data-lucide="waves" style="width: 16px; height: 16px;"></i></span>
+              <h3>Nature Layer</h3>
+            </div>
+            <p class="card-desc">Synthesized base layer.</p>
+            <div class="audio-controls" id="ambient-selector">
+              <button class="freq-btn active" data-ambient="none">None</button>
+              <button class="freq-btn" data-ambient="rain">Rain</button>
+              <button class="freq-btn" data-ambient="ocean">Ocean</button>
+              <button class="freq-btn" data-ambient="wind">Wind</button>
+              <button class="freq-btn" data-ambient="campfire">Fire</button>
+            </div>
+          </div>
+
+          <!-- Color Noise -->
+          <div style="--card-bg-img: url('../assets/thumbnails/abstract_nebula.png'); --card-hue: 300deg;" class="dash-card">
+            <div class="card-header">
+              <span class="card-icon"><i data-lucide="radio" style="width: 16px; height: 16px;"></i></span>
+              <h3>Color Noise</h3>
+            </div>
+            <p class="card-desc">Acoustic masking signal.</p>
+            <div class="audio-controls" id="noise-selector">
+              <button class="freq-btn active" data-noise="none">None</button>
+              <button class="freq-btn" data-noise="white">White</button>
+              <button class="freq-btn" data-noise="pink">Pink</button>
+              <button class="freq-btn" data-noise="brown">Brown</button>
+            </div>
+          </div>
+
+          <!-- Custom Music -->
+          <div style="--card-bg-img: url('../assets/thumbnails/neural_geometric.png'); --card-hue: 280deg;" class="dash-card">
+            <div class="card-header">
+              <span class="card-icon"><i data-lucide="music" style="width: 16px; height: 16px;"></i></span>
+              <h3>Custom Music</h3>
+            </div>
+            <p class="card-desc">Upload a personal track.</p>
+            <label class="file-upload-btn small-btn" id="music-upload-label">
+              <span>+ Select Audio</span>
+              <input type="file" accept="audio/*" id="music-upload" style="display:none">
+            </label>
+            <div class="music-info hidden" id="music-info"></div>
+          </div>
+
+        </div> <!-- /.dash-grid -->
+
+        <div class="dash-footer-bar">
+          <div class="axiom-box">
+             <span class="axiom-label"><i data-lucide="sparkles" style="width: 14px; height: 14px; margin-right:4px;"></i>Axiom:</span>
+             <input type="text" class="axiom-input" id="session-axiom" value="I AM SOVEREIGN" placeholder="Your structural command">
+          </div>
+          
+          <div class="duration-box">
+            <div class="dur-row">
+              <button class="dur-btn" data-dur="300">5m</button>
+              <button class="dur-btn active" data-dur="600">10m</button>
+              <button class="dur-btn" data-dur="900">15m</button>
+              <button class="dur-btn" data-dur="1200">20m</button>
+            </div>
+          </div>
+
+          <button class="begin-btn" id="begin-session">▶ Activate Override</button>
+        </div>
+
+      </div> <!-- /#session-setup -->
+
+      <!-- Protocol Cards (when Protocols tab active) -->
+      <div id="protocol-list" class="hidden"></div>
+      
+      <section id="zone">
+         <div id="zone-idle" class="hidden"></div>
+         <div id="zone-active">
+            <div class="zone-header">
+               <div>
+                  <span id="zone-title" class="zone-title">PROTOCOL</span>
+                  <span id="zone-phase" class="zone-phase">READY</span>
+               </div>
+               <button id="zone-close" class="zone-close" title="Close">✕</button>
+            </div>
+            <div id="visualizer-wrap">
+               <canvas id="visualizer"></canvas>
+            </div>
+            <div id="protocol-controls"></div>
+         </div>
+      </section>
+
+    </main>
+
+    <!-- Session Active (Immersive Fullscreen) -->
+    <div id="session-active">
+      <div id="lottie-viz" class="lottie-viz"></div>
+      <div id="session-canvas-wrap"><canvas id="session-canvas"></canvas></div>
+      <div id="session-axiom-overlay">I AM SOVEREIGN</div>
+      <div id="session-hud">
+        <div class="session-timer" id="session-timer">00:00 / 10:00</div>
+        <div class="session-progress-track"><div class="session-progress-fill" id="session-progress"></div></div>
+        <button id="session-end-btn">END SESSION</button>
+      </div>
+    </div>
+
+    <!-- Journal Modal -->
+    <div id="journal-overlay">
+      <div class="journal-box">
+        <div class="journal-title">Session Journal</div>
+        <textarea class="journal-textarea" placeholder="What did you experience? Physical sensations, imagery, insights..."></textarea>
+        <div class="journal-actions">
+          <button class="btn" id="journal-skip">Skip</button>
+          <button class="btn primary" id="journal-save">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="settings-panel">
+      <div class="settings-title">⚙ CONFIGURATION</div>
+      <div class="setting-group"><div class="setting-label">Wake Time</div><input type="time" class="setting-input" id="set-wake" value="06:00"></div>
+      <div class="setting-group"><div class="setting-label">Axiom</div><input type="text" class="setting-input" id="set-axiom" value="I AM SOVEREIGN"></div>
+      <div class="setting-group"><div class="setting-label">Carrier Frequency (Hz)</div><input type="number" class="setting-input" id="set-carrier" value="200" min="100" max="500"></div>
+      <div class="setting-group"><div class="setting-label">Volume (0-0.3 max)</div><input type="number" class="setting-input" id="set-volume" value="0.25" min="0" max="0.3" step="0.05"></div>
+      <div style="margin-top:20px; font-size:12px; color:#A0A0A0; text-align:center;">Updates auto-save</div>
+    </div>
+
+  </div>
+
+  <script src="js/lottie.min.js"></script>
+  <script src="js/memory.js"></script>
+  <script src="js/audio-engine.js"></script>
+  <script src="js/ambient-engine.js"></script>
+  <script src="js/visualizer.js"></script>
+  <script src="js/rhythm-engine.js"></script>
+  <script src="js/vision-board.js"></script>
+  <script src="js/session.js"></script>
+  <script src="js/protocols.js"></script>
+  <script src="js/app.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>
