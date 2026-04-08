@@ -343,7 +343,7 @@
       if (this._isoType !== 'none') {
         var isoMap = { delta: 2, theta: 6, alpha: 10, beta: 20 };
         var pulseHz = isoMap[this._isoType] || 6;
-        this.audio.playIsochronal(settings.carrierFreq || 200, pulseHz);
+        this.audio.playIsochronal(this.mem.settings().carrierFreq || 200, pulseHz);
       }
 
       // Start breathing guide

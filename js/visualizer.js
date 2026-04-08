@@ -221,6 +221,9 @@
           ctx.fillRect(x, cy - barH / 2, barW - 1, barH);
         }
 
+        // Compute frequency average before overwriting buffer with time-domain data
+        const freqAvg = bins.reduce((a, b) => a + b, 0) / bins.length / 255;
+
         // Waveform line on top of bars
         this._analyser.getByteTimeDomainData(this._fftData);
         ctx.beginPath();
@@ -234,8 +237,7 @@
         ctx.lineWidth = 2; ctx.stroke();
 
         // Center glow based on average amplitude
-        const avg = bins.reduce((a, b) => a + b, 0) / bins.length / 255;
-        this._orb(cx, cy, 15 + avg * 40, 0.2 + avg * 0.3);
+        this._orb(cx, cy, 15 + freqAvg * 40, 0.2 + freqAvg * 0.3);
         return;
       }
 
