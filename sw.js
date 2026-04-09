@@ -1,4 +1,4 @@
-const CACHE_NAME = 'morpheus-v1';
+const CACHE_NAME = 'morpheus-v2';
 const ASSETS = [
   '/',
   '/index.html',
