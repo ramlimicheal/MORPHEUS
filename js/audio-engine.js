@@ -11,7 +11,7 @@
   };
 
   class AudioEngine {
-    constructor() { this.ctx = null; this.nodes = {}; this.active = false; this.volume = 0.25; }
+    constructor() { this.ctx = null; this.nodes = {}; this.active = false; this.volume = 0.25; this.binauralGain = null; this.isoGain = null; this.musicGain = null; this.bankGain = null; this.solfGain = null; this.analyser = null; }
 
     _ensure() {
       if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -25,7 +25,14 @@
       const master = this.ctx.createGain();
       master.gain.setValueAtTime(0, now);
       master.gain.linearRampToValueAtTime(Math.min(this.volume, 0.3), now + 2);
-      master.connect(this.ctx.destination);
+      // Create analyser for FFT visualizer
+      if (!this.analyser) {
+        this.analyser = this.ctx.createAnalyser();
+        this.analyser.fftSize = 256;
+        this.analyser.connect(this.ctx.destination);
+      }
+      master.connect(this.analyser);
+      this.binauralGain = master;
 
       const oscL = this.ctx.createOscillator();
       const panL = this.ctx.createStereoPanner();
@@ -49,7 +56,13 @@
       const master = this.ctx.createGain();
       master.gain.setValueAtTime(0, now);
       master.gain.linearRampToValueAtTime(Math.min(this.volume, 0.3), now + 2);
-      master.connect(this.ctx.destination);
+      if (!this.analyser) {
+        this.analyser = this.ctx.createAnalyser();
+        this.analyser.fftSize = 256;
+        this.analyser.connect(this.ctx.destination);
+      }
+      master.connect(this.analyser);
+      this.isoGain = master;
 
       const osc = this.ctx.createOscillator();
       osc.type = 'sine'; osc.frequency.value = carrier;
@@ -62,6 +75,16 @@
       osc.start(); lfo.start();
       this.nodes = { osc, lfo, lfoG, ampMod, master };
       this.active = true;
+    }
+
+    getAnalyser() {
+      this._ensure();
+      if (!this.analyser) {
+        this.analyser = this.ctx.createAnalyser();
+        this.analyser.fftSize = 256;
+        this.analyser.connect(this.ctx.destination);
+      }
+      return this.analyser;
     }
 
     rampBeat(newHz, dur = 5) {

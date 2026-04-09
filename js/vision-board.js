@@ -20,20 +20,42 @@
     getImages() { return this.images; }
     count() { return this.images.length; }
 
-    /** DOM-based slideshow: sets background-image on container with crossfade */
+    reorder(fromIdx, toIdx) {
+      if (fromIdx < 0 || toIdx < 0 || fromIdx >= this.images.length || toIdx >= this.images.length) return;
+      var item = this.images.splice(fromIdx, 1)[0];
+      this.images.splice(toIdx, 0, item);
+      this._save();
+    }
+
+    /** DOM-based slideshow with Ken Burns effect */
     startSlideshow(container, intervalSec) {
       if (this.images.length === 0) return;
       let idx = 0;
-      // Create two layers for crossfade
       const layerA = document.createElement('div');
       const layerB = document.createElement('div');
       [layerA, layerB].forEach(l => {
-        l.className = 'vb-slide-layer';
+        l.className = 'vb-slide-layer ken-burns';
         container.appendChild(l);
       });
 
+      const kenBurnsStates = [
+        { transform: 'scale(1.0) translate(0, 0)', end: 'scale(1.15) translate(-2%, -1%)' },
+        { transform: 'scale(1.15) translate(-2%, -1%)', end: 'scale(1.0) translate(1%, 1%)' },
+        { transform: 'scale(1.0) translate(1%, 1%)', end: 'scale(1.1) translate(-1%, 2%)' },
+        { transform: 'scale(1.1) translate(-1%, 2%)', end: 'scale(1.0) translate(0, 0)' }
+      ];
+      let kbIdx = 0;
+
       const show = (layer, i) => {
         layer.style.backgroundImage = `url(${this.images[i]})`;
+        var kb = kenBurnsStates[kbIdx % kenBurnsStates.length];
+        kbIdx++;
+        layer.style.transform = kb.transform;
+        // Trigger Ken Burns animation
+        requestAnimationFrame(() => {
+          layer.style.transition = 'transform ' + ((intervalSec || 8)) + 's ease-in-out, opacity 1.5s ease-in-out';
+          layer.style.transform = kb.end;
+        });
       };
 
       show(layerA, 0);
